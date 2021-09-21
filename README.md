@@ -1,5 +1,3 @@
-# NOTE: THIS TOOL HAS NOT BEEN COMPLETED- IT IS NOT USABLE IN ITS CURRENT STATE WITHOUT DIRECT MODIFICATION TO CODE
-
 # Unity Asset Bundle Browser tool
 
 This tool enables the user to view and edit the configuration of asset bundles for their Unity project.  It will block editing that would create invalid bundles, and inform you of any issues with existing bundles.  It also provides basic build functionality.
