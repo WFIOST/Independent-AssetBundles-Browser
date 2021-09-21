@@ -11,6 +11,13 @@ namespace AssetBundleBrowser
     [System.Serializable]
     internal class AssetBundleBuildTab
     {
+
+		public int ABamt;
+		public string[,] ABinfo;
+
+		public BundleDatas bundleData;
+
+
         const string k_BuildPrefPrefix = "ABBBuild:";
 
         private string m_streamingPath = "Assets/StreamingAssets";
@@ -280,8 +287,11 @@ namespace AssetBundleBrowser
                 }
             }
 
-            // build.
-            EditorGUILayout.Space();
+			//bundle data
+			bundleData = EditorGUILayout.ObjectField("Bundle Data", bundleData, typeof(BundleDatas), true) as BundleDatas;
+
+			// build.
+			EditorGUILayout.Space();
             if (GUILayout.Button("Build") )
             {
                 EditorApplication.delayCall += ExecuteBuild;
@@ -356,7 +366,8 @@ namespace AssetBundleBrowser
                 m_InspectTab.RefreshBundles();
             };
 
-            AssetBundleModel.Model.DataSource.BuildAssetBundles (buildInfo);
+			
+			AssetBundleModel.Model.DataSource.BuildAssetBundles (buildInfo, bundleData);
 
             AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
 
