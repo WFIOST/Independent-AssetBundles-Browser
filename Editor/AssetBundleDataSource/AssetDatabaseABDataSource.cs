@@ -29,6 +29,8 @@ namespace AssetBundleBrowser.AssetBundleDataSource
 		public bool GetDependencies = true;
 		[Tooltip("Works like the RootFolders, but excludes only dependencies.")]
 		public List<string> DependenciesToExclude = new List<string>();
+		//[HideInInspector]
+		public bool isData;
 	}
 
 	internal class AssetDatabaseABDataSource : ABDataSource
@@ -132,25 +134,50 @@ namespace AssetBundleBrowser.AssetBundleDataSource
 
 			ABinfo[] ABs = BDs.Bundles;
 
+			//ABinfo[] ABdata = new ABinfo[ABs.Length];
+
+			/*for(int i = 0; i < ABs.Length; i++)
+			{
+				if (ABs[i].splitLateAndData)
+				{
+					ABdata[i] = ABs[i];
+					ABdata[i].isData = true;
+				}
+			}
+			ABs = ABs.Concat(ABdata).ToArray();*/
+
 			AssetBundleBuild[] abb = new AssetBundleBuild[1];
-			//get/build the late bundles
 			for (int i = 0; i < ABs.Length; i++)
 			{
-				if(!ABs[i].setToBuild) { continue; }
-				abb[0] = GenerateAssetBundleAssetList(ABs[i], BDs);
+				//get/build the late bundles
+				if (!ABs[i].setToBuild) { continue; }
+				if (ABs[i] == null) { continue; }
+				//if (ABs[i].isData)
+				//{
+				//	abb[0] = GenerateAssetBundleData(ABs[i], BDs);
+				//}
+				//else
+				//{
+					abb[0] = GenerateAssetBundleAssetList(ABs[i], BDs);
+				//}
+				
 				BuildBundle(abb[0], info, BDs);
+
+				//get/build the data bundles
+				//abb[0] = GenerateAssetBundleData(abb[0], BDs);
+				//BuildBundle(abb[0], info, BDs);
 			}
 
-			//get/build the data bundles
+			/*//get/build the data bundles
 			abb = new AssetBundleBuild[1];
 			for (int i = 0; i < ABs.Length; i++)
 			{
 				if (!ABs[i].setToBuild) { continue; }
 				if (!ABs[i].splitLateAndData) { continue; }
-				abb[0] = GenerateAssetBundleData(ABs[i], BDs);
+				
 				if (abb[0].assetNames.Length == 0) { continue; }
-				BuildBundle(abb[0], info, BDs);
-			}
+				
+			}*/
 			return true;
 		}
 
@@ -176,6 +203,8 @@ namespace AssetBundleBrowser.AssetBundleDataSource
 
 			assets = assets.Where(tag => !tag.Contains(".meta")).ToArray(); //remove all meta files
 			assets = assets.Where(tag => !tag.Contains(".lock")).ToArray(); //remove all lock files
+			assets = assets.Where(tag => !tag.Contains(".dll")).ToArray(); //remove all dll files
+
 
 
 			//remove all excluded files
@@ -227,6 +256,7 @@ namespace AssetBundleBrowser.AssetBundleDataSource
 			assets = assets.Where(tag => !tag.Contains(".meta")).ToArray(); //remove all meta files
 			assets = assets.Where(tag => !tag.Contains(".lock")).ToArray(); //remove all lock files
 			assets = assets.Where(tag => !tag.Contains(".cs")).ToArray(); //remove all cs files
+			assets = assets.Where(tag => !tag.Contains(".dll")).ToArray(); //remove all dll files
 
 			//getting assets is finished!
 			abb.assetNames = assets; //load it up into the ABB
@@ -237,31 +267,36 @@ namespace AssetBundleBrowser.AssetBundleDataSource
 		public static AssetBundleBuild GenerateAssetBundleData(ABinfo info, BundleDatas BDs)
 		{
 			var ab = GenerateAssetBundleAssetList(info, BDs);
-			string[] newAssets = new string[0];
-			newAssets = newAssets.Concat(ab.assetNames.Where(tag => tag.Contains(".asset"))).ToArray();
-			var pngs = ab.assetNames.Where(tag => tag.Contains(".png")).ToArray();
+			//string[] newAssets = ab.assetNames.Where(tag => tag.Contains(".asset")).ToArray();
+			//var pngs = ab.assetNames.Where(tag => tag.Contains("_ISpic")).ToArray();
+			//var pngs = ab.assetNames.Where(tag => tag.Contains(".png")).ToArray();
 			//cook out any pngs named "basecolour", "alloy", and "normal"
 			//literally just basecolour variations
-			pngs = pngs.Where(tag => !tag.ToLower().Contains("basecolour")).ToArray();
-			pngs = pngs.Where(tag => !tag.ToLower().Contains("base colour")).ToArray();
-			pngs = pngs.Where(tag => !tag.ToLower().Contains("basecolor")).ToArray(); //coloUr ftw
-			pngs = pngs.Where(tag => !tag.ToLower().Contains("base color")).ToArray();
+			//pngs = pngs.Where(tag => !tag.ToLower().Contains("basecolour")).ToArray();
+			//pngs = pngs.Where(tag => !tag.ToLower().Contains("base colour")).ToArray();
+			//pngs = pngs.Where(tag => !tag.ToLower().Contains("basecolor")).ToArray(); //coloUr ftw
+			//pngs = pngs.Where(tag => !tag.ToLower().Contains("base color")).ToArray();
 			//end of basecolour variations
-			pngs = pngs.Where(tag => !tag.ToLower().Contains("alloy")).ToArray();
-			pngs = pngs.Where(tag => !tag.ToLower().Contains("normal")).ToArray();
-			newAssets = newAssets.Concat(pngs).ToArray();
-			ab.assetNames = newAssets;
-			Debug.Log(newAssets.Length + " items to add to bundle!");
-			ab.assetBundleName = ab.assetBundleName.Remove(0, 5);
+			//pngs = pngs.Where(tag => !tag.ToLower().Contains("alloy")).ToArray();
+			//pngs = pngs.Where(tag => !tag.ToLower().Contains("normal")).ToArray();
+			//newAssets = newAssets.Concat(pngs).ToArray();
+			//newAssets = newAssets.Where(tag => !tag.Contains(".meta")).ToArray(); //remove all meta files
+			//newAssets = newAssets.Where(tag => !tag.Contains(".lock")).ToArray(); //remove all lock files
+			//newAssets = newAssets.Where(tag => !tag.Contains(".cs")).ToArray(); //remove all cs files
+			//newAssets = newAssets.Where(tag => !tag.Contains(".dll")).ToArray(); //remove all dll files
+			//ab.assetNames = newAssets;
+			//Debug.Log(newAssets.Length + " items to add to bundle!");
+			//ab.assetBundleName = ab.assetBundleName.Remove(0, 5);
 			return ab;
 		}
 
 		public static bool BuildBundle(AssetBundleBuild abb, ABBuildInfo info, BundleDatas BDs)
 		{
-			var buildManifest = BuildPipeline.BuildAssetBundles(info.outputDirectory, new AssetBundleBuild[1] { abb }, info.options, info.buildTarget);
+			Debug.Log("Building Bundle " + abb.assetBundleName);
+			var buildManifest = BuildPipeline.BuildAssetBundles(info.outputDirectory, new AssetBundleBuild[] { abb }, info.options, info.buildTarget);
 			if (buildManifest == null)
 			{
-				Debug.Log("Error in build");
+				Debug.LogError("Error in build");
 				return false;
 			}
 
@@ -280,6 +315,9 @@ namespace AssetBundleBrowser.AssetBundleDataSource
 			var mpath = Path.Combine(info.outputDirectory, mname);
 			if (File.Exists(mpath))
 			{
+				if (File.Exists(Path.Combine(info.outputDirectory, newmname))){
+					File.Delete(Path.Combine(info.outputDirectory, newmname));
+				}
 				File.Move(Path.Combine(info.outputDirectory, mname), Path.Combine(info.outputDirectory, newmname));
 			}
 
