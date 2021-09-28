@@ -132,35 +132,24 @@ namespace AssetBundleBrowser.AssetBundleDataSource
 				return false;
 			}
 
-			ABinfo[] ABs = BDs.Bundles;
+			ABinfo[] ABs = new ABinfo[0];
 
-			//ABinfo[] ABdata = new ABinfo[ABs.Length];
-
-			/*for(int i = 0; i < ABs.Length; i++)
-			{
-				if (ABs[i].splitLateAndData)
-				{
-					ABdata[i] = ABs[i];
-					ABdata[i].isData = true;
-				}
-			}
-			ABs = ABs.Concat(ABdata).ToArray();*/
+			ABs = BDs.Bundles;
 
 			AssetBundleBuild[] abb = new AssetBundleBuild[1];
 			for (int i = 0; i < ABs.Length; i++)
 			{
 				//get/build the late bundles
-				if (!ABs[i].setToBuild) { continue; }
 				if (ABs[i] == null) { continue; }
-				//if (ABs[i].isData)
-				//{
-				//	abb[0] = GenerateAssetBundleData(ABs[i], BDs);
-				//}
-				//else
-				//{
-					abb[0] = GenerateAssetBundleAssetList(ABs[i], BDs);
-				//}
-				
+				if (!ABs[i].setToBuild) { continue; }
+				if (ABs[i].splitLateAndData)
+				{
+					Debug.Log("Generating Data bundle");
+					abb[0] = GenerateAssetBundleData(ABs[i], BDs);
+					BuildBundle(abb[0], info, BDs);
+				}
+				Debug.Log("Generating Late bundle");
+				abb[0] = GenerateAssetBundleAssetList(ABs[i], BDs);
 				BuildBundle(abb[0], info, BDs);
 
 				//get/build the data bundles
@@ -267,26 +256,22 @@ namespace AssetBundleBrowser.AssetBundleDataSource
 		public static AssetBundleBuild GenerateAssetBundleData(ABinfo info, BundleDatas BDs)
 		{
 			var ab = GenerateAssetBundleAssetList(info, BDs);
-			//string[] newAssets = ab.assetNames.Where(tag => tag.Contains(".asset")).ToArray();
+			string[] newAssets = ab.assetNames.Where(tag => tag.Contains(".asset")).ToArray();
 			//var pngs = ab.assetNames.Where(tag => tag.Contains("_ISpic")).ToArray();
-			//var pngs = ab.assetNames.Where(tag => tag.Contains(".png")).ToArray();
+			var pngs = ab.assetNames.Where(tag => tag.Contains(".png")).ToArray();
 			//cook out any pngs named "basecolour", "alloy", and "normal"
 			//literally just basecolour variations
-			//pngs = pngs.Where(tag => !tag.ToLower().Contains("basecolour")).ToArray();
-			//pngs = pngs.Where(tag => !tag.ToLower().Contains("base colour")).ToArray();
-			//pngs = pngs.Where(tag => !tag.ToLower().Contains("basecolor")).ToArray(); //coloUr ftw
-			//pngs = pngs.Where(tag => !tag.ToLower().Contains("base color")).ToArray();
+			pngs = pngs.Where(tag => !tag.ToLower().Contains("basecolour")).ToArray();
+			pngs = pngs.Where(tag => !tag.ToLower().Contains("base colour")).ToArray();
+			pngs = pngs.Where(tag => !tag.ToLower().Contains("basecolor")).ToArray(); //coloUr ftw
+			pngs = pngs.Where(tag => !tag.ToLower().Contains("base color")).ToArray();
 			//end of basecolour variations
-			//pngs = pngs.Where(tag => !tag.ToLower().Contains("alloy")).ToArray();
-			//pngs = pngs.Where(tag => !tag.ToLower().Contains("normal")).ToArray();
-			//newAssets = newAssets.Concat(pngs).ToArray();
-			//newAssets = newAssets.Where(tag => !tag.Contains(".meta")).ToArray(); //remove all meta files
-			//newAssets = newAssets.Where(tag => !tag.Contains(".lock")).ToArray(); //remove all lock files
-			//newAssets = newAssets.Where(tag => !tag.Contains(".cs")).ToArray(); //remove all cs files
-			//newAssets = newAssets.Where(tag => !tag.Contains(".dll")).ToArray(); //remove all dll files
-			//ab.assetNames = newAssets;
-			//Debug.Log(newAssets.Length + " items to add to bundle!");
-			//ab.assetBundleName = ab.assetBundleName.Remove(0, 5);
+			pngs = pngs.Where(tag => !tag.ToLower().Contains("alloy")).ToArray();
+			pngs = pngs.Where(tag => !tag.ToLower().Contains("normal")).ToArray();
+			newAssets = newAssets.Concat(pngs).ToArray();
+			ab.assetNames = newAssets;
+			Debug.Log(newAssets.Length + " items to add to bundle!");
+			ab.assetBundleName = ab.assetBundleName.Remove(0, 5);
 			return ab;
 		}
 
@@ -315,7 +300,8 @@ namespace AssetBundleBrowser.AssetBundleDataSource
 			var mpath = Path.Combine(info.outputDirectory, mname);
 			if (File.Exists(mpath))
 			{
-				if (File.Exists(Path.Combine(info.outputDirectory, newmname))){
+				if (File.Exists(Path.Combine(info.outputDirectory, newmname)))
+				{
 					File.Delete(Path.Combine(info.outputDirectory, newmname));
 				}
 				File.Move(Path.Combine(info.outputDirectory, mname), Path.Combine(info.outputDirectory, newmname));
