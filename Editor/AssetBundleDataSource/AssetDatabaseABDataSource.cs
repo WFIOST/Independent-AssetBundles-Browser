@@ -142,6 +142,25 @@ namespace AssetBundleBrowser.AssetBundleDataSource
 				//get/build the late bundles
 				if (ABs[i] == null) { continue; }
 				if (!ABs[i].setToBuild) { continue; }
+				Debug.Log("Generating Late bundle");
+				abb[0] = GenerateAssetBundleAssetList(ABs[i], BDs);
+				BuildBundle(abb[0], info, BDs);
+				
+				if (ABs[i].splitLateAndData)
+				{
+					Debug.Log("Generating Data bundle");
+					abb[0] = GenerateAssetBundleData(ABs[i], BDs);
+					BuildBundle(abb[0], info, BDs);
+				}
+			}
+			
+			//You may be wondering why this is repeated, just in reverse.
+			//i don't even fucking know. I hate unity.
+			for (int i = 0; i < ABs.Length; i++)
+			{
+				//get/build the late bundles
+				if (ABs[i] == null) { continue; }
+				if (!ABs[i].setToBuild) { continue; }
 				if (ABs[i].splitLateAndData)
 				{
 					Debug.Log("Generating Data bundle");
@@ -151,10 +170,6 @@ namespace AssetBundleBrowser.AssetBundleDataSource
 				Debug.Log("Generating Late bundle");
 				abb[0] = GenerateAssetBundleAssetList(ABs[i], BDs);
 				BuildBundle(abb[0], info, BDs);
-
-				//get/build the data bundles
-				//abb[0] = GenerateAssetBundleData(abb[0], BDs);
-				//BuildBundle(abb[0], info, BDs);
 			}
 
 			/*//get/build the data bundles
